@@ -62,9 +62,9 @@ body{
     font-size: 1.2rem;
 }
 .title-bg{
- background-color: #000;
- opacity:0.6; 
- border-radius: 0 0 5px 0;  
+    background-color: #000;
+    opacity:0.6; 
+    border-radius: 0 0 5px 0;  
 }
 .next,.previous{
     display: inline-block;
@@ -76,9 +76,9 @@ body{
     color:#eee;
 }
 .next{
-margin-left: 10px;
+    margin-left: 10px;
 }
 .previous{
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
