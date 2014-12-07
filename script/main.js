@@ -11,7 +11,9 @@ AJAX.request = function(method, url, callback) {
 var PhotoViewer = (function() {
 	var url = "https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=93971dd7e74a67b5a30fa23b9def8f8e&photoset_id=72157626579923453&format=json&nojsoncallback=1",
 	    photos = [],
-	    currentPhoto = 0;
+	    currentPhoto = 0,
+	    isLoading = false,
+	    loadScreenTimeoutID;
 
 	function loadPhotos() {
 		var response = JSON.parse(this.responseText);
@@ -33,10 +35,16 @@ var PhotoViewer = (function() {
     }
 
 	function showPhoto(photo) {
+		loading(true);
 		var img = document.querySelector(".display-image");
 		img.src = buildPhotoUrl(photo);
-		document.querySelector(".title").textContent = photo.title;
-		img.onload= function () {document.querySelector(".overlay-container").style.display = "block";}
+		
+		img.onload= function () {
+			loading(false)
+			document.querySelector(".title").textContent = photo.title;
+			document.querySelector(".overlay-container").style.display = "block";
+
+		}
 	}
 
     function showNext(){
@@ -64,14 +72,43 @@ var PhotoViewer = (function() {
     	document.querySelector(".next").addEventListener("click",showNext.bind(this));
     }
 
+    function loading(loading){
+    	if(isLoading != loading ){
+			isLoading = loading;
+	    	var screenEl = document.querySelector(".screen");
+	    	if(loading){
+	    		loadScreenTimeoutID = setTimeout(function(){
+	    			var loadingEl = document.createElement("div");
+	    			var loadingText = document.createTextNode("LOADING"); 
+	  				loadingEl.appendChild(loadingText); 
+	    			screenEl.appendChild(loadingEl);
+	    			screenEl.style.zIndex = 2;
+	    		},300);
+	    			
+	    	}else {
+	    		window.clearTimeout(loadScreenTimeoutID);
+	    		console.log(screenEl.firstChild);
+	    		if(screenEl.firstChild) {
+	    			screenEl.style.zIndex = 0;
+
+	    			screenEl.removeChild(screenEl.firstChild);
+	    		}
+				
+
+	    	}
+    	}
+    }
+
 	return {
 		url: url,
 		loadPhotos : loadPhotos,
 		bindEvents : bindEvents,
+		loading : loading
 	};
 })();
 
 window.onload = function(){
+	PhotoViewer.loading(true)
 	PhotoViewer.bindEvents();
 	AJAX.request("get", PhotoViewer.url, PhotoViewer.loadPhotos);
 };

@@ -17,7 +17,6 @@ body{
 #container {
     width:100%;
 }
-
 .screen{
     position: fixed;
     top: 0;
@@ -25,16 +24,16 @@ body{
     bottom: 0;
     right: 0;
     text-align:center;  
+    background-color: #000;
+    opacity:0.7;
 }
 .no-scroll{
     overflow: hidden;
 }
-.screen{
-    background-color: #000;
-    opacity:0.7;
-}
 .overlay-container{
-    display: none;
+  display: none;  
+}
+.overlay-container, .screen div {
     position: absolute;   
     top: 50%;
     -webkit-transform: translateY(-50%);
@@ -42,29 +41,37 @@ body{
     transform: translateY(-50%);
     width: 100%;
 }
+.screen div {
+    font-size:1.2rem;
+}
 .overlay-content{
     position:relative;
     display: inline-block;
     vertical-align: middle;
-    background-color: #fff;
+    background-color: #000;
     border-radius: 5px;
     padding: 20px;
 }
-.title-bg,.title{
+.title-bg-container,.title{
     position: absolute;
-    left: 20px;
+    left: 0px;
     top: 20px;
+    padding: 0 20px;
     z-index: 1;
     height: 36px;
-    width: 50%
+    width: 100%;
 }
-.title{
+.title-bg{
+    z-index: 1;
+    height: 36px;
+}
+.title {
+    padding-top: 6px;
     font-size: 1.2rem;
 }
 .title-bg{
     background-color: #000;
-    opacity:0.6; 
-    border-radius: 0 0 5px 0;  
+    opacity:0.6;  
 }
 .next,.previous{
     display: inline-block;
