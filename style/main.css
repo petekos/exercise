@@ -1,21 +1,21 @@
 
 html {
     box-sizing: border-box;
-    height:100%;
+    height: 100%;
 }
 *, *:before, *:after {
     box-sizing: inherit;
 }
 body{
-    height:100%;
-    margin:0;
-    color:#aaa;
-    font-size:.7em;
+    height: 100%;
+    margin: 0;
+    color: #aaa;
+    font-size: .7em;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     text-align: center;
 }
 #container {
-    width:100%;
+    width: 100%;
 }
 .screen{
     position: fixed;
@@ -23,15 +23,15 @@ body{
     left: 0;
     bottom: 0;
     right: 0;
-    text-align:center;  
-    background-color: #000;
+    text-align: center;  
+    background-color: #fff;
     opacity:0.7;
 }
 .no-scroll{
     overflow: hidden;
 }
 .overlay-container{
-  display: none;  
+    display: none;  
 }
 .overlay-container, .screen div {
     position: absolute;   
@@ -45,33 +45,52 @@ body{
     font-size:1.2rem;
 }
 .overlay-content{
-    position:relative;
+    position: relative;
     display: inline-block;
     vertical-align: middle;
     background-color: #000;
-    border-radius: 5px;
-    padding: 20px;
+    border-radius: 3px;
+    height: auto;
+    max-width: 680px;
+    overflow:hidden;
+    box-shadow: 5px 5px 1em black;
+}
+.overlay-content img {
+    width: 100%;
+    height: 100%;
+    max-width: 640px;
+    max-height: 424px;
+    
+}
+.overlay-content:hover .title-bg-container, .overlay-content:hover .title{
+    top: 0px;
+    opacity:1;
+    height: 36px;
 }
 .title-bg-container,.title{
     position: absolute;
     left: 0px;
-    top: 20px;
-    padding: 0 20px;
+    top: -36px;
     z-index: 1;
-    height: 36px;
+    height: 0px;
     width: 100%;
+    opacity:0;  
+    transition: top 0.7s , height 0.7s , opacity 0.7s; 
 }
 .title-bg{
     z-index: 1;
     height: 36px;
 }
 .title {
+    text-align:left;
+    padding:30px;
     padding-top: 6px;
     font-size: 1.2rem;
+    color:#fff;
 }
 .title-bg{
     background-color: #000;
-    opacity:0.6;  
+    opacity:0.7;  
 }
 .next,.previous{
     display: inline-block;
@@ -83,9 +102,14 @@ body{
     color:#eee;
 }
 .next{
+    width:20px;
     margin-left: 10px;
 }
+
 .previous{
     margin-right: 10px;
 }
 
+.close{
+    display:none;
+}
