@@ -5,21 +5,25 @@
         <link rel="stylesheet" href="style/main.css" />      
     </head>
     <body>
-        <div id="container"></div>
-        <div class="screen"></div>
 
+        <button><i class="fa fa-image "></i> Show Images</button>
+        <div class="loading"><i class="fa fa-spinner fa-spin  "></i></div>
+        <div class="screen" ></div>
         <div class="overlay-container">
             <i class="fa fa-chevron-left previous"></i>
             <div class="overlay-content">
-                <div class="close">X</div>
-                <div class="title-bg-container">
-                    <div class="title-bg"></div>
+                <div class="title-bg"></div>
+                <div class="title">
+                    <div class="title-text"></div>
+                    <div class="title-icons">
+                        <i class="fa fa-external-link external-link "></i>
+                        <i class="fa fa-comment comment "></i>
+                        <i class="fa fa-close close"></i>
+                    </div>
                 </div>
-                <div class="title"></div>
                 <img class="display-image"/></div> 
             <i class="fa fa-chevron-right next"></i>
         </div>
-
         <script src="script/main.js" ></script>
     </body>
 </html>

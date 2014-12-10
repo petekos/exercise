@@ -6,7 +6,7 @@ html {
 *, *:before, *:after {
     box-sizing: inherit;
 }
-body{
+body {
     height: 100%;
     margin: 0;
     color: #aaa;
@@ -14,26 +14,55 @@ body{
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     text-align: center;
 }
+button {
+    position: relative;  
+    display:block; 
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    padding: 20px;
+    background-color: #C94E50;
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #fff;
+    width:160px;
+    margin: 0 auto;
+}
+button:hover {
+    box-shadow: 3px 3px 0.5em #333;
+}
+button:focus {
+    outline: none;
+}
 #container {
     width: 100%;
+    height: 100%;
 }
-.screen{
+.screen {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     text-align: center;  
-    background-color: #fff;
-    opacity:0.7;
+    background-color: #000;
+    opacity: 0.7;
 }
-.no-scroll{
+.no-scroll {
     overflow: hidden;
 }
-.overlay-container{
+.overlay-container {
     display: none;  
 }
-.overlay-container, .screen div {
+.loading{
+    display: none;
+    font-size: 3rem; 
+    z-index: 3;
+}
+.overlay-container, .loading {
     position: absolute;   
     top: 50%;
     -webkit-transform: translateY(-50%);
@@ -42,17 +71,18 @@ body{
     width: 100%;
 }
 .screen div {
-    font-size:1.2rem;
+    font-size: 1.2rem;
+    color: #eee;
 }
-.overlay-content{
+.overlay-content {
     position: relative;
     display: inline-block;
     vertical-align: middle;
     background-color: #000;
     border-radius: 3px;
     height: auto;
+    overflow: hidden;
     max-width: 680px;
-    overflow:hidden;
     box-shadow: 5px 5px 1em black;
 }
 .overlay-content img {
@@ -60,56 +90,97 @@ body{
     height: 100%;
     max-width: 640px;
     max-height: 424px;
-    
+    border-radius: 3px;
 }
-.overlay-content:hover .title-bg-container, .overlay-content:hover .title{
-    top: 0px;
-    opacity:1;
-    height: 36px;
-}
-.title-bg-container,.title{
+.title-bg, .title {
     position: absolute;
     left: 0px;
-    top: -36px;
-    z-index: 1;
-    height: 0px;
-    width: 100%;
-    opacity:0;  
-    transition: top 0.7s , height 0.7s , opacity 0.7s; 
+    width: 100%;  
 }
-.title-bg{
-    z-index: 1;
-    height: 36px;
+.title-bg {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    top: 0px;
+    height: 0px;
+    background-color: #000;
+    opacity: 0;  
+    transition: height 0.5s, opacity 0.3s;  
 }
 .title {
+   top: -50px;
+   height: 50px;
+   transition: top 0.6s;  
+}
+.overlay-content:hover .title-bg {
+    opacity: 0.7;
+    height: 50px;
+}
+.overlay-content:hover .title {
+    top: 0;   
+}
+.title {
+    padding-top: 15px;
+    padding-left: 20px;
+    overflow: hidden;
     text-align:left;
-    padding:30px;
-    padding-top: 6px;
+    z-index: 1;
     font-size: 1.2rem;
     color:#fff;
 }
-.title-bg{
-    background-color: #000;
-    opacity:0.7;  
+.small .title {
+    font-size: 0.8rem;
 }
-.next,.previous{
+.small .external-link, .small .comment, .small .close{
+    font-size:1rem;
+    margin-left: 0; 
+}
+.small .close {
+    margin-right:10px;
+}
+.title-text {
+    float: left;
+}
+.title-icons {
+    float:right;
+}
+.next,.previous {
+    color:#ccc;
     display: inline-block;
+    vertical-align: middle;
     font-weight: bold;
     font-size:3rem;
+    transition: transform 0.5s ease-in-out;
 }
-.next:hover, .previous:hover{
+.small .next, .small .previous{
+    font-size:2rem;
+}
+.small .previous:hover{
+   transform: translate(-5px , 0); 
+}
+.previous:hover {
+    transform: translate(-10px , 0);
     cursor:pointer;
-    color:#eee;
+    color:#777; 
 }
-.next{
-    width:20px;
+.small .next:hover{
+   transform: translate(5px , 0);  
+}
+.next:hover {
+    transform: translate(10px , 0);
+    cursor:pointer;
+    color:#777;   
+}
+.next {
     margin-left: 10px;
 }
-
-.previous{
+.previous {
     margin-right: 10px;
 }
 
-.close{
-    display:none;
+.comment {
+    margin-left: 5px;  
+}
+.close {
+    margin-left: 10px;
+    margin-right: 20px;
 }
