@@ -73,6 +73,8 @@ var CommentViewer = (function(){
 					displayComment(comments[i]);
 				}	
 			}	
+		} else {
+			Util.query(".comment-container").innerHTML = "No comments yet";
 		}
 	}
 
@@ -313,7 +315,7 @@ var PhotoViewer = (function() {
 			finalHeight = Math.round(proposedWidth * heightToWidth);
 		}
 
-		if (finalHeight < 200) {
+		if (finalHeight < 250) {
 			Util.query(".overlay-container").classList.add("small");
 		} else {
 			Util.query(".overlay-container").classList.remove("small")
