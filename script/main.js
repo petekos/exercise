@@ -190,7 +190,6 @@ var PhotoViewer = (function() {
 				},30)
 			    currentPreloadIdx++;
 			}
-			
 		}
 	}
 
