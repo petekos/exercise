@@ -38,10 +38,9 @@ var Util = (function(){
 })();
 
 var CommentViewer = (function(){
-	var comments = [];
 
 	function show() {
-		displayComments(PhotoViewer.getCurrentPhotoIdx());
+		displayComments(PhotoViewer.getCurrentPhotoId());
 		Util.query(".overlay-container").classList.add("flip");
 		Util.query(".title").style.display = "none";
 		Util.query(".title-bg").style.display = "none";		
@@ -64,7 +63,7 @@ var CommentViewer = (function(){
 	}
 
 	function displayComments(photoId) {
-		console.log(photoId);
+		var comments =[];
 		Util.query(".comment-container").innerHTML = "";
 		if (hasComments(photoId)) {
 			comments = getComments(photoId);
@@ -84,16 +83,21 @@ var CommentViewer = (function(){
 
 	function addComment() {
 		var inputEl = Util.query(".input-container input"),
-			comment = {};
+			comment = {},
+			comments =[];
 		if(inputEl.value != ""){
 			comment.text = inputEl.value;
 			comment.date = new Date();
 			comment.date = comment.date.toLocaleString();
 			comment.name = "Anonymous";
 			inputEl.value = "";
-			displayComment(comment);
+			if(hasComments(PhotoViewer.getCurrentPhotoId())){
+				comments = getComments(PhotoViewer.getCurrentPhotoId())
+			} 
+			
 			comments.push(comment);
-			localStorage.setItem(PhotoViewer.getCurrentPhotoIdx(), JSON.stringify(comments)); 	
+			localStorage.setItem(PhotoViewer.getCurrentPhotoId(), JSON.stringify(comments)); 
+			displayComments(PhotoViewer.getCurrentPhotoId());	
 		}	
 	}
 
@@ -340,12 +344,12 @@ var PhotoViewer = (function() {
 			default:
 		}
 	}
-	function getCurrentPhotoIdx(){
-		return currentPhotoIdx;
+	function getCurrentPhotoId(){
+		return photos[currentPhotoIdx].id;
 	}
 	return {
 		init: init,
-		getCurrentPhotoIdx: getCurrentPhotoIdx,
+		getCurrentPhotoId: getCurrentPhotoId,
 		resize: resize,
 	};
 })();
