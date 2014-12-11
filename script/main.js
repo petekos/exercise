@@ -1,41 +1,126 @@
 'use strict'
-// a couple util methods ...these shouldnt be declared in the global scope
+
 var query = document.querySelector.bind(document);
 
-function throttle(callback, limit){
-	var wait = false;
-	return function() {
-		if (!wait) {
-			callback.call();
-			wait = true;
-			setTimeout(function() {
-				wait = false;
-			}, limit);
-		}
-	};
-} 
+var Util = (function(){
 
-function removeClass(className, classString) {
-	var classes = classString.split(" ");
-	if(classes.length > 0 ){
-		for (var i = 0; i < classes.length; i++) {
-			if(className == classes[i]){
-				classes[i] = "";
-				break;
+	function throttle(callback, limit){
+		var wait = false;
+		return function() {
+			if (!wait) {
+				callback.call();
+				wait = true;
+				setTimeout(function() {
+					wait = false;
+				}, limit);
 			}
-		}
-		return classes.join(" ");	
+		};
 	}
-	
-}
 
-var AJAX = {};
-AJAX.request = function(method, url, callback) {
-	var req = new XMLHttpRequest();
-	req.onload = callback;
-	req.open(method, url, true);
-	req.send();
-};
+	function request(method, url, callback){
+		var req = new XMLHttpRequest();
+		req.onload = callback;
+		req.open(method, url, true);
+		req.send();	
+	}
+
+	function clampDimensions(el, img) {
+		el.style.maxWidth = img.naturalWidth +"px";
+		el.style.maxHeight = img.naturalHeight + "px";	
+	}
+
+	return {
+		throttle: throttle,
+		request: request,
+		clampDimensions: clampDimensions ,
+		query: document.querySelector.bind(document)
+	}
+})();
+
+var CommentViewer = (function(){
+	var comments = [];
+
+	function show() {
+		displayComments(PhotoViewer.getCurrentPhotoIdx());
+		Util.query(".overlay-container").classList.add("flip");
+		Util.query(".title").style.display = "none";
+		Util.query(".title-bg").style.display = "none";		
+	}
+
+	function hide() {
+		Util.query(".overlay-container").classList.remove("flip");
+		Util.query(".title").style.display = "block";
+		Util.query(".title-bg").style.display = "block";	
+	}
+
+	function bindEvents() {
+		Util.query(".comment").addEventListener("click", show);
+		Util.query(".comment-back").addEventListener("click", hide);
+		Util.query(".comment-btn").addEventListener("click", addComment);
+	}
+
+	function hasComments(photoId) {
+		return localStorage.getItem(photoId) != null;
+	}
+
+	function displayComments(photoId) {
+		console.log(photoId);
+		Util.query(".comment-container").innerHTML = "";
+		if (hasComments(photoId)) {
+			comments = getComments(photoId);
+			if (comments != null) {
+				for (var i = 0; i < comments.length; i++) {
+					displayComment(comments[i]);
+				}	
+			}	
+		}
+	}
+
+	function getComments(photoId) {
+		return JSON.parse(localStorage.getItem(photoId));
+	}
+
+	function addComment() {
+		var inputEl = Util.query(".input-container input"),
+			comment = {};
+		if(inputEl.value != ""){
+			comment.text = inputEl.value;
+			comment.date = new Date();
+			comment.date = comment.date.toLocaleString();
+			comment.name = "Anonymous";
+			inputEl.value = "";
+			displayComment(comment);
+			comments.push(comment);
+			localStorage.setItem(PhotoViewer.getCurrentPhotoIdx(), JSON.stringify(comments)); 	
+		}	
+	}
+
+	function displayComment(comment) {
+		var commentEl = document.createElement("div"),
+		    userNameEl = document.createElement("span"),
+			dateEl = document.createElement("div");
+
+		userNameEl.appendChild(document.createTextNode(comment.name));	
+		commentEl.appendChild(userNameEl);
+		commentEl.appendChild(document.createTextNode(comment.text));
+		dateEl.appendChild(document.createTextNode(comment.date));
+		commentEl.appendChild(dateEl);
+		commentEl.classList.add("comment-content");
+
+		Util.query(".comment-container").appendChild(commentEl);
+	}
+
+	function setTitle(title) {
+		Util.query(".comment-title-text").textContent = title;
+	}
+
+	return {
+		bindEvents: bindEvents,
+		hide: hide,
+		show: show,
+		setTitle: setTitle
+	}
+})();
 
 var PhotoViewer = (function() {  
 	var photos = [],
@@ -48,7 +133,15 @@ var PhotoViewer = (function() {
 		preload = 5,
 		prefetch = 3,
 		pages = 0,
-		currentPage = 1;
+		currentPage = 1,
+		eventsBound = false;
+
+	function init(){
+		Util.query("button.show").style.display = "none";
+		loading(true);
+		bindEvents();
+		Util.request("get", buildApiUrl(1), loadPhotos);
+	}
 
 	function buildApiUrl(page) {
 		return "https://api.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=93971dd7e74a67b5a30fa23b9def8f8e&photoset_id=72157626579923453&per_page=10&page="+page+"&format=json&nojsoncallback=1"
@@ -72,15 +165,15 @@ var PhotoViewer = (function() {
 	function enableNavigation() {
 
 		if (currentPhotoIdx == 0) {
-			query(".previous").style.visibility = "hidden"; 
+			Util.query(".previous").style.visibility = "hidden"; 
 		} else {
-			query(".previous").style.visibility = "visible"; 
+			Util.query(".previous").style.visibility = "visible"; 
 		}
 
 		if (currentPhotoIdx == (photos.length - 1)) {
-			query(".next").style.visibility = "hidden";
+			Util.query(".next").style.visibility = "hidden";
 		} else {
-			query(".next").style.visibility = "visible"; 
+			Util.query(".next").style.visibility = "visible"; 
 		}
 	}
 
@@ -104,12 +197,13 @@ var PhotoViewer = (function() {
 	function prefetchResults() {
 		if (currentPage < pages && (currentPhotoIdx >= (photos.length - prefetch ))) {
 			currentPage++;
-			AJAX.request("get", PhotoViewer.buildApiUrl(currentPage), PhotoViewer.loadPhotos);	
+			Util.request("get", buildApiUrl(currentPage), loadPhotos);	
 		}	
 	}
 
 	function showPhoto(photo) {
-		var img = query(".display-image");
+		CommentViewer.hide();
+		var img = Util.query(".display-image");
 
 		loading(true);
 		img.src = buildPhotoUrl(photo);
@@ -117,7 +211,7 @@ var PhotoViewer = (function() {
 		preloadImages();
 		if(!img.complete){
 			img.onload = function (event) {
-					onImageLoad(img);
+				onImageLoad(img);
 			};
 		} else {
 			onImageLoad(img);
@@ -129,15 +223,16 @@ var PhotoViewer = (function() {
 		enableNavigation();
 		widthToHeight = img.naturalWidth/img.naturalHeight;
 		heightToWidth = img.naturalHeight/img.naturalWidth;
-		query(".overlay-content").style.maxWidth = img.naturalWidth +"px";	
-		query(".overlay-content").style.maxHeight = img.naturalHeight + "px";	
-		query(".title-text").textContent = photos[currentPhotoIdx].title;
-		query(".overlay-container").style.display = "block";
+		Util.clampDimensions(Util.query(".overlay-content"), img);
+		Util.clampDimensions(Util.query(".comment-panel"), img);
+		Util.query(".title-text").textContent = photos[currentPhotoIdx].title;
+		CommentViewer.setTitle(photos[currentPhotoIdx].title);
+		Util.query(".overlay-container").style.display = "block";
 		resize();
 	}
 
 	function openCurrentPhoto() {
-		window.open(buildPhotoUrl(photos[currentPhotoIdx]),"_blank");
+		window.open(buildPhotoUrl(photos[currentPhotoIdx]), "_blank");
 	}
 
 	function showNext() {
@@ -159,35 +254,40 @@ var PhotoViewer = (function() {
 	}
 
 	function closePhoto() {
-		query(".overlay-container").style.display="none";
-		query(".screen").style.display="none";
+		Util.query(".overlay-container").style.display = "none";
+		Util.query(".screen").style.display = "none";
+		Util.query("button.show").style.display = "block"
 	}
 
 	function bindEvents() {
-		query(".previous").addEventListener("click",showPrevious.bind(this));
-		query(".next").addEventListener("click",showNext.bind(this));
-		window.addEventListener("resize", throttle(PhotoViewer.resize,100));
-		window.addEventListener("keyup", PhotoViewer.keyNav);
-		query(".close").addEventListener("click", closePhoto);
-		query(".external-link").addEventListener("click", openCurrentPhoto );
+		if(!eventsBound){
+			Util.query(".previous").addEventListener("click",showPrevious.bind(this));
+			Util.query(".next").addEventListener("click",showNext.bind(this));
+			window.addEventListener("resize", Util.throttle(resize,50));
+			window.addEventListener("keyup", keyNav);
+			Util.query(".close").addEventListener("click", closePhoto);
+			Util.query(".external-link").addEventListener("click", openCurrentPhoto );
+			CommentViewer.bindEvents();	
+			eventsBound = true;
+		}
+		
 	}
 
 	function loading(loading) {
 		if(isLoading != loading) {
 			isLoading = loading;
-			var screenEl = query(".screen");
+			var screenEl = Util.query(".screen");
 			screenEl.style.display = "block";
 			if (loading) {
 				loadScreenTimeoutID = setTimeout(function() {
-					query(".loading").style.display = "block";
+					Util.query(".loading").style.display = "block";
 					screenEl.style.zIndex = 2;
 				},300);
 					
 			} else {
 				window.clearTimeout(loadScreenTimeoutID);
-				
 				screenEl.style.zIndex = 0;
-				query(".loading").style.display = "none";
+				Util.query(".loading").style.display = "none";
 				
 			}
 		}
@@ -196,7 +296,7 @@ var PhotoViewer = (function() {
 	function resize() {
 		var width = document.documentElement.clientWidth,
 			height = document.documentElement.clientHeight,
-			overlay = query(".overlay-content"),
+			overlay = Util.query(".overlay-content"),
 			proposedHeight = 0,
 			proposedWidth = 0,
 			finalHeight = 0,
@@ -206,19 +306,21 @@ var PhotoViewer = (function() {
 		proposedWidth = (width - 120);
 		if (proposedHeight < proposedWidth * heightToWidth ) {
 			//start from height
-			finalWidth = (proposedHeight * widthToHeight);
+			finalWidth = Math.round(proposedHeight * widthToHeight);
 			finalHeight = proposedHeight;
 		} else {
 			//start from width
 			finalWidth = proposedWidth; 
-			finalHeight = (proposedWidth * heightToWidth);
+			finalHeight = Math.round(proposedWidth * heightToWidth);
 		}
 
 		if (finalHeight < 200) {
-			query(".overlay-container").className += " small";
+			Util.query(".overlay-container").classList.add("small");
 		} else {
-			query(".overlay-container").className = removeClass("small", query(".overlay-container").className);
+			Util.query(".overlay-container").classList.remove("small")
 		}
+		Util.query(".comment-panel").style.width = finalWidth + "px";
+		Util.query(".comment-panel").style.height = finalHeight + "px";
 		overlay.style.width = finalWidth + "px";
 		overlay.style.height = finalHeight + "px";
 	}
@@ -237,21 +339,18 @@ var PhotoViewer = (function() {
 			default:
 		}
 	}
-
+	function getCurrentPhotoIdx(){
+		return currentPhotoIdx;
+	}
 	return {
-		buildApiUrl: buildApiUrl,
-		loadPhotos: loadPhotos,
-		bindEvents: bindEvents,
-		loading : loading,
+		init: init,
+		getCurrentPhotoIdx: getCurrentPhotoIdx,
 		resize: resize,
-		keyNav: keyNav
 	};
 })();
 
 window.onload = function() {
-	query("button").addEventListener("click",function() {
-		PhotoViewer.loading(true);
-		PhotoViewer.bindEvents();
-		AJAX.request("get", PhotoViewer.buildApiUrl(1), PhotoViewer.loadPhotos);
+	Util.query("button.show").addEventListener("click",function() {
+		PhotoViewer.init();
 	});	
 };

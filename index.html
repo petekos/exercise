@@ -5,13 +5,29 @@
         <link rel="stylesheet" href="style/main.css" />      
     </head>
     <body>
-
-        <button><i class="fa fa-image "></i> Show Images</button>
-        <div class="loading"><i class="fa fa-spinner fa-spin  "></i></div>
+        <button class="show">
+            <i class="fa fa-image"></i> Show Images
+        </button>
+        <div class="loading">
+            <i class="fa fa-spinner fa-spin"></i>
+            <div>Loading</div>
+        </div>
         <div class="screen" ></div>
         <div class="overlay-container">
             <i class="fa fa-chevron-left previous"></i>
             <div class="overlay-content">
+                <img class="display-image"/>
+                <div class="comment-panel">
+                    <div class="comment-title">
+                        <i class="fa fa-reply comment-back"></i>
+                        <div class="comment-title-text"></div>
+                    </div>
+                    <div class="comment-container"></div> 
+                    <div class="input-container">
+                        <input type="text" />
+                        <button class="comment-btn"><i class="fa fa-comment"></i></button>
+                    </div>
+                </div>
                 <div class="title-bg"></div>
                 <div class="title">
                     <div class="title-text"></div>
@@ -21,7 +37,7 @@
                         <i class="fa fa-close close"></i>
                     </div>
                 </div>
-                <img class="display-image"/></div> 
+            </div> 
             <i class="fa fa-chevron-right next"></i>
         </div>
         <script src="script/main.js" ></script>
