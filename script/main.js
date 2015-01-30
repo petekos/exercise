@@ -1,7 +1,5 @@
 'use strict'
 
-var query = document.querySelector.bind(document);
-
 var Util = (function(){
 
 	function throttle(callback, limit){
